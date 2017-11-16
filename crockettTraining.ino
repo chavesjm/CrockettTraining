@@ -241,6 +241,7 @@ int16_t tempCount;            // temperature raw count output
 float   temperature;          // Stores the MPU9250 gyro internal chip temperature in degrees Celsius
 float SelfTest[6];            // holds results of gyro and accelerometer self test
 int value=0;
+int difficulty = 0;
 bool newMagData = false;
 
 // global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
@@ -349,11 +350,9 @@ void setup()
 
 void loop()
 {
-	//value = analogRead(potencioMeter);
-
 	if(Serial.available())
 	{
-	    char c = Serial.read();  //gets one byte from serial buffer
+		char c = Serial.read();  //gets one byte from serial buffer
 	    if (c == '\0')
 	    {
 	      if (readString.length() >1)
@@ -383,6 +382,8 @@ void loop()
 		{
 			readString += c; //makes the string readString
 		}
+
+		Serial.println(value);
 	}
 
 	beta = map(value,0,1023,2,200)/100.0f;
@@ -493,6 +494,9 @@ void loop()
 		//if(yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
 		//roll  *= 180.0f / PI;
 
+		difficulty = analogRead(potencioMeter);
+		difficulty = map(difficulty,0,1023,1,20);
+
 		phi = atan2(a32, a33);
 		theta = -atan(a31/sqrtf(1-a31*a31));
 		psi = atan2(a21,a11);
@@ -501,71 +505,108 @@ void loop()
 		theta = theta * 180./ PI;
 		psi = psi * 180./ PI;
 
-		if((psi - psi_initial) > 1.5)
+		if((psi - psi_initial) > 3.0f)
 		{
-			digitalWrite(leftTurn,false);
-			digitalWrite(rightTurn,true);
+			digitalWrite(leftTurn,LOW);
+			digitalWrite(rightTurn,HIGH);
 		}
-		else if((psi - psi_initial) < 1.5)
+		else if((psi - psi_initial) < -3.0f)
 		{
-			digitalWrite(leftTurn,true);
-			digitalWrite(rightTurn,false);
+			digitalWrite(leftTurn,HIGH);
+			digitalWrite(rightTurn,LOW);
 		}
 		else
 		{
-			digitalWrite(leftTurn,false);
-			digitalWrite(rightTurn,false);
+			digitalWrite(leftTurn,LOW);
+			digitalWrite(rightTurn,LOW);
 		}
 
 		if(SerialDebug)
 		{
 			Serial.print(1/deltat,2);
-			Serial.print("\t");
+			Serial.print(",");
 			Serial.print(beta,2);
-			Serial.print("\t");
+			Serial.print(",");
 			Serial.print(theta, 2);
-			Serial.print("\t");
+			Serial.print(",");
 			Serial.print(psi, 2);
-			Serial.print("\t");
+			Serial.print(",");
 			Serial.print(phi, 2);
-			Serial.print("\t");
+			Serial.print(",");
 			Serial.print(theta_initial, 2);
-			Serial.print("\t");
+			Serial.print(",");
 			Serial.print(psi_initial, 2);
-			Serial.print("\t");
+			Serial.print(",");
 			Serial.print(phi_initial, 2);
-			Serial.print("\t");
+			Serial.print(",");
 			Serial.print(theta-theta_initial, 2);
-			Serial.print("\t");
+			Serial.print(",");
 			Serial.print(psi-psi_initial, 2);
-			Serial.print("\t");
+			Serial.print(",");
 			Serial.print(phi-phi_initial, 2);
-			Serial.print("\t");
-			Serial.println(value, 10);
+			Serial.print(",");
+			Serial.print(difficulty, 10);
+			Serial.print(",");
+			Serial.print(ax, 2);
+			Serial.print(",");
+		    Serial.print(ay, 2);
+		    Serial.print(",");
+		    Serial.print(az, 2);
+		    Serial.print(",");
+		    Serial.print(gx, 2);
+		    Serial.print(",");
+		    Serial.print(gy, 2);
+		    Serial.print(",");
+		    Serial.print(gz, 2);
+		    Serial.print(",");
+		    Serial.print(mx, 2);
+		    Serial.print(",");
+		    Serial.print(my, 2);
+		    Serial.print(",");
+		    Serial.println(mz, 2);
 
-			BluethootSerial.print(1/deltat,2);
-			BluethootSerial.print("\t");
-			BluethootSerial.print(beta,2);
-			BluethootSerial.print("\t");
-			BluethootSerial.print(theta, 2);
-			BluethootSerial.print("\t");
-			BluethootSerial.print(psi, 2);
-			BluethootSerial.print("\t");
-			BluethootSerial.print(phi, 2);
-			BluethootSerial.print("\t");
-			BluethootSerial.print(theta_initial, 2);
-			BluethootSerial.print("\t");
-			BluethootSerial.print(psi_initial, 2);
-			BluethootSerial.print("\t");
-			BluethootSerial.print(phi_initial, 2);
-			BluethootSerial.print("\t");
-			BluethootSerial.print(theta-theta_initial, 2);
-			BluethootSerial.print("\t");
-			BluethootSerial.print(psi-psi_initial, 2);
-			BluethootSerial.print("\t");
-			BluethootSerial.print(phi-phi_initial, 2);
-			BluethootSerial.print("\t");
-			BluethootSerial.println(value, 10);
+
+		    BluethootSerial.print(1/deltat,2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(beta,2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(theta, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(psi, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(phi, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(theta_initial, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(psi_initial, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(phi_initial, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(theta-theta_initial, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(psi-psi_initial, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(phi-phi_initial, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(difficulty, 10);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(ax, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(ay, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(az, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(gx, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(gy, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(gz, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(mx, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.print(my, 2);
+		    BluethootSerial.print(",");
+		    BluethootSerial.println(mz, 2);
 
 		}
 

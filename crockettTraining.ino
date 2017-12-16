@@ -273,8 +273,9 @@ String readString;
 
 //Push Button
 bool pushButtonPushed = false;
+bool started = false;
 
-#define BluethootCom true
+//#define BluethootCom true
 
 #ifdef BluethootCom
 SoftwareSerial BluethootSerial(6, 5); // RX | TX
@@ -416,11 +417,13 @@ void loop()
 		pitch_initial = pitch;
 		roll_initial = roll;
 		digitalWrite(laser,LOW);
+		started = true;
 	}
 	else if(digitalRead(pushButton))
 	{
 		pushButtonPushed = true;
 		digitalWrite(laser,HIGH);
+		started = false;
 	}
 	else
 	{
@@ -542,7 +545,7 @@ void loop()
 		yaw   *= 180.0f / PI;
 		//yaw   += 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
 		yaw   -= 1.39f;
-		if(yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
+		//if(yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
 		roll  *= 180.0f / PI;
 		lin_ax = ax + a31;
 		lin_ay = ay + a32;
@@ -551,13 +554,13 @@ void loop()
 		difficulty = analogRead(potencioMeter);
 		rangeOK = map(difficulty,0,1023,0,300) / 100.0;
 
-		if((yaw - yaw_initial) > rangeOK)
+		if(started && ((yaw - yaw_initial) > rangeOK))
 		{
 			digitalWrite(ledLeftTurn,LOW);
 			digitalWrite(ledRightTurn,HIGH);
 			tone(speaker, 1200, 100);
 		}
-		else if((yaw- yaw_initial) < (rangeOK * -1.0))
+		else if(started && ((yaw- yaw_initial) < (rangeOK * -1.0)))
 		{
 			digitalWrite(ledLeftTurn,HIGH);
 			digitalWrite(ledRightTurn,LOW);

@@ -213,10 +213,12 @@ float aRes, gRes, mRes;      // scale resolutions per LSB for the sensors
 // Pin definitions
 const int potencioMeter = A0;
 const int8_t pushButton = 11;
-const int8_t leftTurn = 13;
-const int8_t rightTurn = 12;
-const int8_t rightDoubleTurn = 9;
-const int8_t leftDoubleTurn = 8;
+const int8_t ledLeftTurn = 13;
+const int8_t ledRightTurn = 12;
+const int8_t ledRightDoubleTurn = 9;
+const int8_t ledLeftDoubleTurn = 8;
+const int8_t laser = 3;
+const int8_t speaker = 10;
 
 int16_t MPU9250Data[7]; // used to read all 14 bytes at once from the MPU9250 accel/gyro
 int16_t accelCount[3];  // Stores the 16-bit signed accelerometer sensor output
@@ -229,6 +231,7 @@ float   temperature;          // Stores the MPU9250 gyro internal chip temperatu
 float SelfTest[6];            // holds results of gyro and accelerometer self test
 float value=4.0;
 int difficulty = 0;
+float rangeOK = 0.0;
 bool newMagData = false;
 
 // global constants for 9 DoF fusion and AHRS (Attitude and Heading Reference System)
@@ -290,15 +293,19 @@ void setup()
 #endif
 
 	// Set up the interrupt pin, its set as active high, push-pull
-	pinMode(rightTurn, OUTPUT);
-	pinMode(leftTurn, OUTPUT);
-	pinMode(rightDoubleTurn, OUTPUT);
-	pinMode(leftDoubleTurn, OUTPUT);
+	pinMode(ledRightTurn, OUTPUT);
+	pinMode(ledLeftTurn, OUTPUT);
+	pinMode(ledRightDoubleTurn, OUTPUT);
+	pinMode(ledLeftDoubleTurn, OUTPUT);
+	pinMode(speaker, OUTPUT);
+	pinMode(laser, OUTPUT);
 
-	digitalWrite(rightTurn, HIGH);
-	digitalWrite(leftTurn, HIGH);
-	digitalWrite(rightDoubleTurn, HIGH);
-	digitalWrite(leftDoubleTurn, HIGH);
+	digitalWrite(ledRightTurn, HIGH);
+	digitalWrite(ledLeftTurn, HIGH);
+	digitalWrite(ledRightDoubleTurn, HIGH);
+	digitalWrite(ledLeftDoubleTurn, HIGH);
+	digitalWrite(speaker,LOW);
+	digitalWrite(laser,LOW);
 
 	delay(1000);
 
@@ -347,10 +354,10 @@ void setup()
 		while(1) ; // Loop forever if communication doesn't happen
 	}
 
-	digitalWrite(rightTurn, LOW);
-	digitalWrite(leftTurn, LOW);
-	digitalWrite(rightDoubleTurn, LOW);
-	digitalWrite(leftDoubleTurn, LOW);
+	digitalWrite(ledRightTurn, LOW);
+	digitalWrite(ledLeftTurn, LOW);
+	digitalWrite(ledRightDoubleTurn, LOW);
+	digitalWrite(ledLeftDoubleTurn, LOW);
 }
 
 
@@ -408,13 +415,18 @@ void loop()
 		yaw_initial = yaw;
 		pitch_initial = pitch;
 		roll_initial = roll;
+		digitalWrite(laser,LOW);
+	}
+	else if(digitalRead(pushButton))
+	{
+		pushButtonPushed = true;
+		digitalWrite(laser,HIGH);
 	}
 	else
 	{
-		pushButtonPushed = digitalRead(pushButton);
+		pushButtonPushed = false;
+		digitalWrite(laser,LOW);
 	}
-
-
 
 	if(readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01)
 	{
@@ -537,22 +549,25 @@ void loop()
 		lin_az = az - a33;
 
 		difficulty = analogRead(potencioMeter);
-		difficulty = map(difficulty,0,1023,1,20);
+		rangeOK = map(difficulty,0,1023,0,300) / 100.0;
 
-		if((yaw - yaw_initial) > 3.0f)
+		if((yaw - yaw_initial) > rangeOK)
 		{
-			digitalWrite(leftTurn,LOW);
-			digitalWrite(rightTurn,HIGH);
+			digitalWrite(ledLeftTurn,LOW);
+			digitalWrite(ledRightTurn,HIGH);
+			tone(speaker, 1200, 100);
 		}
-		else if((yaw- yaw_initial) < -3.0f)
+		else if((yaw- yaw_initial) < (rangeOK * -1.0))
 		{
-			digitalWrite(leftTurn,HIGH);
-			digitalWrite(rightTurn,LOW);
+			digitalWrite(ledLeftTurn,HIGH);
+			digitalWrite(ledRightTurn,LOW);
+			tone(speaker, 750, 100);
 		}
 		else
 		{
-			digitalWrite(leftTurn,LOW);
-			digitalWrite(rightTurn,LOW);
+			digitalWrite(ledLeftTurn,LOW);
+			digitalWrite(ledRightTurn,LOW);
+			digitalWrite(speaker,LOW);
 		}
 
 		if(SerialDebug)
@@ -581,7 +596,7 @@ void loop()
 			BluethootSerial.print(",");
 			BluethootSerial.print(roll-roll_initial, 2);
 			BluethootSerial.print(",");
-			BluethootSerial.println(difficulty, 10);
+			BluethootSerial.println(rangeOK, 2);
 #else
 			Serial.print(1/deltat,2);
 			Serial.print(",");
@@ -605,7 +620,7 @@ void loop()
 			Serial.print(",");
 			Serial.print(roll-roll_initial, 2);
 			Serial.print(",");
-			Serial.println(difficulty, 10);
+			Serial.println(rangeOK, 2);
 #endif
 		}
 

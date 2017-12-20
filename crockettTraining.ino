@@ -253,10 +253,12 @@ float zeta = sqrt(3.0f / 4.0f) * GyroMeasDrift;   // compute zeta, the other fre
 uint32_t angleUpdate = 0, count = 0;  // used to control display output rate
 float pitch, yaw, roll;
 float pitch_initial, yaw_initial, roll_initial;
+float pitch_previous, yaw_previous, roll_previous;
 float a11, a12, a21, a22, a31, a32, a33;            // rotation matrix coefficients for Euler angles and gravity components
 float deltat = 0.0f;           // integration interval for both filter schemes
 uint32_t lastUpdate = 0; // used to calculate integration interval
 uint32_t Now = 0;                         // used to calculate integration interval
+uint32_t lastTime=0;
 
 float ax, ay, az, gx, gy, gz, mx, my, mz; // variables to hold latest sensor data values
 float lin_ax, lin_ay, lin_az;             // linear acceleration (acceleration with gravity component subtracted)
@@ -266,7 +268,8 @@ float eInt[3] = {0.0f, 0.0f, 0.0f};       // vector to hold integral error for M
 #ifdef ArduinoUNO
 int maxX = 305, minX = -212, maxY = 930, minY = 423, maxZ = 1207, minZ = 651;
 #else
-int maxX = 179, minX = -316, maxY = 893, minY = 396, maxZ = 224, minZ = -296;
+//int maxX = 179, minX = -316, maxY = 893, minY = 396, maxZ = 224, minZ = -296;
+int maxX = 198, minX = -300, maxY = 901, minY = 406, maxZ = 277, minZ = -244;
 #endif
 
 String readString;
@@ -275,7 +278,7 @@ String readString;
 bool pushButtonPushed = false;
 bool started = false;
 
-//#define BluethootCom true
+#define BluethootCom true
 
 #ifdef BluethootCom
 SoftwareSerial BluethootSerial(6, 5); // RX | TX
@@ -366,44 +369,36 @@ void loop()
 {
 
 #ifdef BluethootCom
-	if(BluethootSerial.available())
-	{
-		char c = BluethootSerial.read();  //gets one byte from serial buffer
-		if (c == '\0')
-		{
-			if (readString.length() >1)
-			{
-				int valueReceived = readString.toInt();  //convert readString into a number
-				readString = "";
-				value = map(valueReceived,0,1023,10,10000)/100.0f;
-				GyroMeasError = PI * (value / 180.0f);   // gyroscope measurement error in rads/s (start at 40 deg/s)
-				beta = sqrt(3.0f / 4.0f) * GyroMeasError;   // compute beta
-			}
+	if (BluethootSerial.available() > 0) {   // something came across serial
+		    int integerValue = 0;         // throw away previous integerValue
+		    char incomingByte;
+		    while(1) {            // force into a loop until 'n' is received
+		      incomingByte = BluethootSerial.read();
+		      if (incomingByte == '\0') break;   // exit the while(1), we're done receiving
+		      if (incomingByte == -1) continue;  // if no characters are in the buffer read() returns -1
+		      integerValue *= 10;  // shift left 1 decimal place
+		      // convert ASCII to integer, add, and shift left 1 decimal place
+		      integerValue = ((incomingByte - 48) + integerValue);
+		    }
+		    value = map(integerValue,0,1023,10,10000)/100.0f;
+		    GyroMeasError = PI * (value / 180.0f);   // gyroscope measurement error in rads/s (start at 40 deg/s)
+		    beta = sqrt(3.0f / 4.0f) * GyroMeasError;   // compute beta
 		}
-		else
-		{
-			readString += c; //makes the string readString
-		}
-	}
 #else
-	if(Serial.available())
-	{
-		char c = Serial.read();  //gets one byte from serial buffer
-		if (c == '\0')
-		{
-			if (readString.length() >1)
-			{
-				int valueReceived = readString.toInt();  //convert readString into a number
-				readString = "";
-				value = map(valueReceived,0,1023,10,10000)/100.0f;
-				GyroMeasError = PI * (value / 180.0f);   // gyroscope measurement error in rads/s (start at 40 deg/s)
-				beta = sqrt(3.0f / 4.0f) * GyroMeasError;   // compute beta
-			}
-		}
-		else
-		{
-			readString += c; //makes the string readString
-		}
+	if (Serial.available() > 0) {   // something came across serial
+	    int integerValue = 0;         // throw away previous integerValue
+	    char incomingByte;
+	    while(1) {            // force into a loop until 'n' is received
+	      incomingByte = Serial.read();
+	      if (incomingByte == '\0') break;   // exit the while(1), we're done receiving
+	      if (incomingByte == -1) continue;  // if no characters are in the buffer read() returns -1
+	      integerValue *= 10;  // shift left 1 decimal place
+	      // convert ASCII to integer, add, and shift left 1 decimal place
+	      integerValue = ((incomingByte - 48) + integerValue);
+	    }
+	    value = map(integerValue,0,1023,10,10000)/100.0f;
+	    GyroMeasError = PI * (value / 180.0f);   // gyroscope measurement error in rads/s (start at 40 deg/s)
+	    beta = sqrt(3.0f / 4.0f) * GyroMeasError;   // compute beta
 	}
 #endif
 
@@ -538,15 +533,24 @@ void loop()
 		a31 =   2.0f * (q[0] * q[1] + q[2] * q[3]);
 		a32 =   2.0f * (q[1] * q[3] - q[0] * q[2]);
 		a33 =   q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3];
+
+		pitch_previous = pitch;
+		roll_previous = roll;
+		yaw_previous = yaw;
+
+		lastTime = (micros() - lastTime);
+
 		pitch = -asinf(a32);
 		roll  = atan2f(a31, a33);
 		yaw   = atan2f(a12, a22);
-		pitch *= 180.0f / PI;
+
 		yaw   *= 180.0f / PI;
 		//yaw   += 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
 		yaw   -= 1.39f;
 		//if(yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
 		roll  *= 180.0f / PI;
+
+
 		lin_ax = ax + a31;
 		lin_ay = ay + a32;
 		lin_az = az - a33;
@@ -599,7 +603,13 @@ void loop()
 			BluethootSerial.print(",");
 			BluethootSerial.print(roll-roll_initial, 2);
 			BluethootSerial.print(",");
-			BluethootSerial.println(rangeOK, 2);
+			BluethootSerial.print(rangeOK, 2);
+			BluethootSerial.print(",");
+			BluethootSerial.print((yaw-yaw_previous)/(lastTime/1000000.0f),4);
+			BluethootSerial.print(",");
+			BluethootSerial.print((pitch-pitch_previous)/(lastTime/1000000.0f),4);
+			BluethootSerial.print(",");
+			BluethootSerial.println((roll-roll_previous)/(lastTime/1000000.0f),4);
 #else
 			Serial.print(1/deltat,2);
 			Serial.print(",");
@@ -623,7 +633,13 @@ void loop()
 			Serial.print(",");
 			Serial.print(roll-roll_initial, 2);
 			Serial.print(",");
-			Serial.println(rangeOK, 2);
+			Serial.print(rangeOK, 2);
+			Serial.print(",");
+			Serial.print((yaw-yaw_previous)/(lastTime/1000000.0f),4);
+			Serial.print(",");
+			Serial.print((pitch-pitch_previous)/(lastTime/1000000.0f),4);
+			Serial.print(",");
+			Serial.println((roll-roll_previous)/(lastTime/1000000.0f),4);
 #endif
 		}
 

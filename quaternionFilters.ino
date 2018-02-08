@@ -6,7 +6,7 @@
 // but is much less computationally intensive---it can be performed on a 3.3 V Pro Mini operating at 8 MHz!
 void MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz)
 {
-	float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
+	float q1 = CT_q[0], q2 = CT_q[1], q3 = CT_q[2], q4 = CT_q[3];   // short name local variable for readability
 	float norm;
 	float hx, hy, _2bx, _2bz;
 	float s1, s2, s3, s4;
@@ -77,22 +77,22 @@ void MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, 
 	s4 *= norm;
 
 	// Compute rate of change of quaternion
-	qDot1 = 0.5f * (-q2 * gx - q3 * gy - q4 * gz) - beta * s1;
-	qDot2 = 0.5f * (q1 * gx + q3 * gz - q4 * gy) - beta * s2;
-	qDot3 = 0.5f * (q1 * gy - q2 * gz + q4 * gx) - beta * s3;
-	qDot4 = 0.5f * (q1 * gz + q2 * gy - q3 * gx) - beta * s4;
+	qDot1 = 0.5f * (-q2 * gx - q3 * gy - q4 * gz) - CT_beta * s1;
+	qDot2 = 0.5f * (q1 * gx + q3 * gz - q4 * gy) - CT_beta * s2;
+	qDot3 = 0.5f * (q1 * gy - q2 * gz + q4 * gx) - CT_beta * s3;
+	qDot4 = 0.5f * (q1 * gz + q2 * gy - q3 * gx) - CT_beta * s4;
 
 	// Integrate to yield quaternion
-	q1 += qDot1 * deltat;
-	q2 += qDot2 * deltat;
-	q3 += qDot3 * deltat;
-	q4 += qDot4 * deltat;
+	q1 += qDot1 * CT_deltat;
+	q2 += qDot2 * CT_deltat;
+	q3 += qDot3 * CT_deltat;
+	q4 += qDot4 * CT_deltat;
 	norm = sqrtf(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
 	norm = 1.0f/norm;
-	q[0] = q1 * norm;
-	q[1] = q2 * norm;
-	q[2] = q3 * norm;
-	q[3] = q4 * norm;
+	CT_q[0] = q1 * norm;
+	CT_q[1] = q2 * norm;
+	CT_q[2] = q3 * norm;
+	CT_q[3] = q4 * norm;
 
 }
 
@@ -102,7 +102,7 @@ void MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, 
 // measured ones.
 void MahonyQuaternionUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz)
 {
-	float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
+	float q1 = CT_q[0], q2 = CT_q[1], q3 = CT_q[2], q4 = CT_q[3];   // short name local variable for readability
 	float norm;
 	float hx, hy, bx, bz;
 	float vx, vy, vz, wx, wy, wz;
@@ -155,39 +155,39 @@ void MahonyQuaternionUpdate(float ax, float ay, float az, float gx, float gy, fl
 	ex = (ay * vz - az * vy) + (my * wz - mz * wy);
 	ey = (az * vx - ax * vz) + (mz * wx - mx * wz);
 	ez = (ax * vy - ay * vx) + (mx * wy - my * wx);
-	if (Ki > 0.0f)
+	if (CT_Ki > 0.0f)
 	{
-		eInt[0] += ex;      // accumulate integral error
-		eInt[1] += ey;
-		eInt[2] += ez;
+		CT_eInt[0] += ex;      // accumulate integral error
+		CT_eInt[1] += ey;
+		CT_eInt[2] += ez;
 	}
 	else
 	{
-		eInt[0] = 0.0f;     // prevent integral wind up
-		eInt[1] = 0.0f;
-		eInt[2] = 0.0f;
+		CT_eInt[0] = 0.0f;     // prevent integral wind up
+		CT_eInt[1] = 0.0f;
+		CT_eInt[2] = 0.0f;
 	}
 
 	// Apply feedback terms
-	gx = gx + Kp * ex + Ki * eInt[0];
-	gy = gy + Kp * ey + Ki * eInt[1];
-	gz = gz + Kp * ez + Ki * eInt[2];
+	gx = gx + CT_Kp * ex + CT_Ki * CT_eInt[0];
+	gy = gy + CT_Kp * ey + CT_Ki * CT_eInt[1];
+	gz = gz + CT_Kp * ez + CT_Ki * CT_eInt[2];
 
 	// Integrate rate of change of quaternion
 	pa = q2;
 	pb = q3;
 	pc = q4;
-	q1 = q1 + (-q2 * gx - q3 * gy - q4 * gz) * (0.5f * deltat);
-	q2 = pa + (q1 * gx + pb * gz - pc * gy) * (0.5f * deltat);
-	q3 = pb + (q1 * gy - pa * gz + pc * gx) * (0.5f * deltat);
-	q4 = pc + (q1 * gz + pa * gy - pb * gx) * (0.5f * deltat);
+	q1 = q1 + (-q2 * gx - q3 * gy - q4 * gz) * (0.5f * CT_deltat);
+	q2 = pa + (q1 * gx + pb * gz - pc * gy) * (0.5f * CT_deltat);
+	q3 = pb + (q1 * gy - pa * gz + pc * gx) * (0.5f * CT_deltat);
+	q4 = pc + (q1 * gz + pa * gy - pb * gx) * (0.5f * CT_deltat);
 
 	// Normalise quaternion
 	norm = sqrtf(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);
 	norm = 1.0f / norm;
-	q[0] = q1 * norm;
-	q[1] = q2 * norm;
-	q[2] = q3 * norm;
-	q[3] = q4 * norm;
+	CT_q[0] = q1 * norm;
+	CT_q[1] = q2 * norm;
+	CT_q[2] = q3 * norm;
+	CT_q[3] = q4 * norm;
 
 }

@@ -545,24 +545,25 @@ void loop()
 		CT_difficulty = analogRead(CT_potencioMeter);
 		CT_rangeOK = map(CT_difficulty,0,1023,0,300) / 100.0;
 
+
 		if(CT_started && ((CT_yaw - CT_yaw_initial) > CT_rangeOK))
 		{
 			digitalWrite(CT_ledLeftTurn,LOW);
 			digitalWrite(CT_ledRightTurn,HIGH);
-			//tone(CT_speaker, 1200);
+			tone(CT_speaker, 1200);
 		}
 		else if(CT_started && ((CT_yaw- CT_yaw_initial) < (CT_rangeOK * -1.0)))
 		{
 			digitalWrite(CT_ledLeftTurn,HIGH);
 			digitalWrite(CT_ledRightTurn,LOW);
-			//tone(CT_speaker, 750);
+			tone(CT_speaker, 750);
 		}
 		else
 		{
 			digitalWrite(CT_ledLeftTurn,LOW);
 			digitalWrite(CT_ledRightTurn,LOW);
 			digitalWrite(CT_speaker,LOW);
-			//noTone(CT_speaker);
+			noTone(CT_speaker);
 		}
 
 		if(CT_SerialDebug)

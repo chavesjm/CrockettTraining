@@ -12,6 +12,29 @@ void MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, 
 	float s1, s2, s3, s4;
 	float qDot1, qDot2, qDot3, qDot4;
 
+	/*Serial.print(ax,16);
+	Serial.print(",");
+	Serial.print(ay,16);
+	Serial.print(",");
+	Serial.print(az,16);
+	Serial.print(",");
+	Serial.print(gx,16);
+	Serial.print(",");
+	Serial.print(gy,16);
+	Serial.print(",");
+	Serial.print(gz,16);
+	Serial.print(",");
+	Serial.print(mx,16);
+	Serial.print(",");
+	Serial.print(my,16);
+	Serial.print(",");
+	Serial.print(mz,16);
+	Serial.print(",");
+	Serial.print(CT_deltat,16);
+	Serial.print(",");
+	Serial.print(CT_beta,16);
+	Serial.print(",");*/
+
 	// Auxiliary variables to avoid repeated arithmetic
 	float _2q1mx;
 	float _2q1my;
@@ -93,6 +116,14 @@ void MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, 
 	CT_q[1] = q2 * norm;
 	CT_q[2] = q3 * norm;
 	CT_q[3] = q4 * norm;
+
+	/*Serial.print(CT_q[0],16);
+	Serial.print(",");
+	Serial.print(CT_q[1],16);
+	Serial.print(",");
+	Serial.print(CT_q[2],16);
+	Serial.print(",");
+	Serial.println(CT_q[3],16);*/
 
 }
 

@@ -35,14 +35,14 @@ enum TrainerStatus{
 
 MPU9250_DMP imu;
 
-#define BluetoothConf
+//#define BluetoothConf
 #ifdef BluetoothConf
 BluetoothSerial SerialOutput;
 #else
 #define SerialOutput Serial
 #endif
 
-#define DIFFICULTY_LEVEL 3
+//#define DIFFICULTY_LEVEL 3
 
 unsigned long m_last_update = 0;
 float m_yaw = 0;
@@ -53,14 +53,37 @@ float m_initial_pitch = 0;
 float m_initial_roll = 0;
 float m_lower_error_yaw = 0;
 float m_upper_error_yaw = 0;
+uint16_t m_potenciometer_raw_value = 0;
+float m_difficult_level = 0;
 
 TrainerStatus m_status = IDLE;
 
-int PinButton = 17;
-int PinBuzzer = 2;
+/***************************
+BUZZER: GPIO16.
+LASER: GPIO23
+POTENCIOMETRO: GPIO35
+BATERIA: GPIO34.
+I2C SDA: GPIO21.
+I2C SCL: GPIO22.
+LED LEFT: GPIO18.
+LED RIGHT:GPIO32.
+PULSADOR: GPIO17.
+*******************************/
+
+#define MAX_ERROR 3
+
+#define BUTTON_PIN 17
+#define BUZZER_PIN 16
+#define LASER_PIN 23
+#define POTENCIOMETER_PIN 35
+#define BATTERY_PIN 34
+#define RIGHT_LED_PIN 32
+#define LEFT_LED_PIN 18
 
 void setup()
 {
+	esp_log_level_set("*", ESP_LOG_WARN);
+
 	int freq = getCpuFrequencyMhz();
 
 	SerialOutput.begin(115200);
@@ -73,15 +96,16 @@ void setup()
 
 	m_status = IDLE;
 
-	pinMode(PinButton, INPUT);
-	pinMode(PinBuzzer, OUTPUT);
+	pinMode(BUTTON_PIN, INPUT);
+	pinMode(RIGHT_LED_PIN,OUTPUT);
+	pinMode(LEFT_LED_PIN,OUTPUT);
+	pinMode(BUZZER_PIN, OUTPUT);
 
 	// Call imu.begin() to verify communication and initialize
 	if (imu.begin() != INV_SUCCESS)
 	{
 		while (1)
 		{
-			digitalWrite(PinBuzzer, HIGH);
 			SerialOutput.println("Unable to communicate with MPU-9250");
 			SerialOutput.println("Check connections, and try again.");
 			SerialOutput.println();
@@ -125,16 +149,29 @@ void setup()
 		SerialOutput.print("FIFO not reseted with code: ");
 		SerialOutput.println(res,HEX);
 	}
+
+	tone(BUZZER_PIN,1000,3000);
+	digitalWrite(LEFT_LED_PIN,HIGH);
+	digitalWrite(RIGHT_LED_PIN,HIGH);
+	delay(3000);
+	digitalWrite(LEFT_LED_PIN,LOW);
+	digitalWrite(RIGHT_LED_PIN,LOW);
 }
 
 void loop()
 {
-	if(digitalRead(PinButton)){
+	if(!digitalRead(BUTTON_PIN)){
 		m_status = SELECTING;
-		digitalWrite(PinBuzzer, LOW);
 		m_initial_pitch = 0;
 		m_initial_yaw = 0;
 		m_initial_roll = 0;
+		m_difficult_level = 0;
+		m_potenciometer_raw_value = 0;
+
+		noTone(BUZZER_PIN);
+		digitalWrite(LEFT_LED_PIN,LOW);
+		digitalWrite(RIGHT_LED_PIN,LOW);
+
 	}else{
 		if(m_status == SELECTING){
 			m_status = SELECTED;
@@ -175,15 +212,34 @@ void printIMUData(void)
 		m_initial_pitch = m_pitch;
 		m_initial_roll = m_roll;
 		m_initial_yaw = m_yaw;
-
-		m_upper_error_yaw = (m_yaw + DIFFICULTY_LEVEL) > 360 ? ((m_yaw + DIFFICULTY_LEVEL) - 360):(m_yaw + DIFFICULTY_LEVEL);
-		m_lower_error_yaw = (m_yaw - DIFFICULTY_LEVEL) < 0 ? (360 - (m_yaw - DIFFICULTY_LEVEL)):(m_yaw - DIFFICULTY_LEVEL);
 	}
 
-	if(m_status == PLAYING && ((m_yaw > m_upper_error_yaw) || (m_yaw < m_lower_error_yaw))){
-		digitalWrite(PinBuzzer, HIGH);
-	}else{
-		digitalWrite(PinBuzzer, LOW);
+	if(m_status == PLAYING){
+		uint16_t value = analogRead(POTENCIOMETER_PIN);
+		if(value != m_potenciometer_raw_value){
+			m_potenciometer_raw_value = value;
+
+			m_difficult_level = (m_potenciometer_raw_value * MAX_ERROR) / 4098.0;
+			m_upper_error_yaw = (m_yaw + m_difficult_level) > 360 ? ((m_yaw + m_difficult_level) - 360):(m_yaw + m_difficult_level);
+			m_lower_error_yaw = (m_yaw - m_difficult_level) < 0 ? (360 - (m_yaw - m_difficult_level)):(m_yaw - m_difficult_level);
+
+		}
+	}
+
+	if(m_status == PLAYING){
+		if(m_yaw > m_upper_error_yaw){
+			tone(BUZZER_PIN,2000,0);
+			digitalWrite(LEFT_LED_PIN,HIGH);
+			digitalWrite(RIGHT_LED_PIN,LOW);
+		}else if(m_yaw < m_lower_error_yaw){
+			tone(BUZZER_PIN,2000,0);
+			digitalWrite(LEFT_LED_PIN,LOW);
+			digitalWrite(RIGHT_LED_PIN,HIGH);
+		}else{
+			noTone(BUZZER_PIN);
+			digitalWrite(RIGHT_LED_PIN,LOW);
+			digitalWrite(LEFT_LED_PIN,LOW);
+		}
 	}
 
 	unsigned long current_update = millis();
@@ -214,6 +270,6 @@ void printIMUData(void)
 	SerialOutput.print(';');
 	SerialOutput.print(String(m_roll - m_initial_roll));
 	SerialOutput.print(';');
-	SerialOutput.println(String(DIFFICULTY_LEVEL));
+	SerialOutput.println(String(m_difficult_level));
 
 }

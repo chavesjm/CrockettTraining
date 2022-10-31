@@ -39,7 +39,7 @@
 		<link>
 			<name>core/variant</name>
 			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/2.0.3/variants/ttgo-lora32-v1</locationURI>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/2.0.3/variants/nodemcu-32s</locationURI>
 		</link>
 		<link>
 			<name>libraries/BluetoothSerial</name>

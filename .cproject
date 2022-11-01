@@ -19,31 +19,31 @@
 							<builder buildPath="${workspace_loc:/MPU9250DMP}/Release" id="io.sloeber.sketch.builder.1156875157" keepEnvironmentInBuildfile="false" name="Arduino sketch builder" parallelBuildOn="false" superClass="io.sloeber.sketch.builder"/>
 							<tool id="io.sloeber.tool.sketch.compiler.cpp.1659263582" name="Arduino C++ Compiler" superClass="io.sloeber.tool.sketch.compiler.cpp">
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.cpp.sketch.option.incpath.2060718685" name="Include Paths (-I)" superClass="io.sloeber.compiler.cpp.sketch.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Wire/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1143291726" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
 							<tool id="io.sloeber.tool.compiler.c.1838085973" name="Arduino C Compiler" superClass="io.sloeber.tool.compiler.c">
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.c.sketch.option.incpath.961147239" name="Include Paths (-I)" superClass="io.sloeber.compiler.c.sketch.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Wire/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.886189450" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
 							<tool id="io.sloeber.tool.sketch.compiler.s.1761523869" name="Arduino Assembler" superClass="io.sloeber.tool.sketch.compiler.s">
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.asm.sketch.option.incpath.1741522635" name="Include Paths (-I)" superClass="io.sloeber.compiler.asm.sketch.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Wire/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1138897786" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

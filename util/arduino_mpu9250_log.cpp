@@ -30,12 +30,12 @@ Supported Platforms:
 
 void logString(char * string) 
 {
-	Serial.println(string);
+	//Serial.println(string);
 }
 
 void logValue(int value)
 {
-	Serial.println(value,DEC);
+	//Serial.println(value,DEC);
 }
 
 int _MLPrintLog (int priority, const char* tag, const char* fmt, ...)

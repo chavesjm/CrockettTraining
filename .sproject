@@ -1,7 +1,7 @@
 Config.Release.board.BOARD.ID=nodemcu-32s
 Config.Release.board.BOARD.MENU.DebugLevel=none
-Config.Release.board.BOARD.MENU.EraseFlash=getMenuItemIDFromMenuItemName did not find menu item with name "" for menu ID "EraseFlash" and for boardID "nodemcu-32s"!
-Config.Release.board.BOARD.MENU.FlashFreq=40
+Config.Release.board.BOARD.MENU.EraseFlash=none
+Config.Release.board.BOARD.MENU.FlashFreq=80
 Config.Release.board.BOARD.MENU.UploadSpeed=460800
 Config.Release.board.BOARD.TXT=${SLOEBER_HOME}/arduinoPlugin/packages/esp32/hardware/esp32/2.0.5/boards.txt
 Config.Release.board.PROGRAMMER.NAME=Default

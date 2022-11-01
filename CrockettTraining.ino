@@ -82,7 +82,7 @@ PULSADOR: GPIO17.
 
 void setup()
 {
-	esp_log_level_set("*", ESP_LOG_WARN);
+	esp_log_level_set("*", ESP_LOG_NONE);
 
 	int freq = getCpuFrequencyMhz();
 
@@ -232,7 +232,7 @@ void printIMUData(void)
 			digitalWrite(LEFT_LED_PIN,HIGH);
 			digitalWrite(RIGHT_LED_PIN,LOW);
 		}else if(m_yaw < m_lower_error_yaw){
-			tone(BUZZER_PIN,2000,0);
+			tone(BUZZER_PIN,1000,0);
 			digitalWrite(LEFT_LED_PIN,LOW);
 			digitalWrite(RIGHT_LED_PIN,HIGH);
 		}else{

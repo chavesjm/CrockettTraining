@@ -22,6 +22,7 @@ Supported Platforms:
 - ATSAMD21 (Arduino Zero, SparkFun SAMD21 Breakouts)
  *************************************************************/
 #include "Arduino.h"
+#include "math.h"
 #include "SparkFunMPU9250-DMP.h"
 #include "BluetoothSerial.h"
 
@@ -51,8 +52,9 @@ float m_roll = 0;
 float m_initial_yaw = 0;
 float m_initial_pitch = 0;
 float m_initial_roll = 0;
-float m_lower_error_yaw = 0;
-float m_upper_error_yaw = 0;
+float m_yaw_error = 0;
+float m_pitch_error = 0;
+float m_roll_error = 0;
 uint16_t m_potenciometer_raw_value = 0;
 float m_difficult_level = 0;
 
@@ -167,6 +169,9 @@ void loop()
 		m_initial_roll = 0;
 		m_difficult_level = 0;
 		m_potenciometer_raw_value = 0;
+		m_yaw_error = 0;
+		m_pitch_error = 0;
+		m_roll_error = 0;
 
 		noTone(BUZZER_PIN);
 		digitalWrite(LEFT_LED_PIN,LOW);
@@ -209,29 +214,27 @@ void printIMUData(void)
 
 	if(m_status == SELECTED && m_initial_pitch == 0 && m_initial_roll == 0 && m_initial_yaw == 0){
 		m_status = PLAYING;
+		tone(BUZZER_PIN, 1000, 200);
 		m_initial_pitch = m_pitch;
 		m_initial_roll = m_roll;
 		m_initial_yaw = m_yaw;
+		m_yaw_error = 0;
+		m_pitch_error = 0;
+		m_roll_error = 0;
 	}
 
-	if(m_status == PLAYING){
-		uint16_t value = analogRead(POTENCIOMETER_PIN);
-		if(value != m_potenciometer_raw_value){
-			m_potenciometer_raw_value = value;
-
-			m_difficult_level = (m_potenciometer_raw_value * MAX_ERROR) / 4098.0;
-			m_upper_error_yaw = (m_yaw + m_difficult_level) > 360 ? ((m_yaw + m_difficult_level) - 360):(m_yaw + m_difficult_level);
-			m_lower_error_yaw = (m_yaw - m_difficult_level) < 0 ? (360 - (m_yaw - m_difficult_level)):(m_yaw - m_difficult_level);
-
-		}
-	}
+	m_potenciometer_raw_value = analogRead(POTENCIOMETER_PIN);
+	m_difficult_level = (m_potenciometer_raw_value * MAX_ERROR) / 4098.0;
 
 	if(m_status == PLAYING){
-		if(m_yaw > m_upper_error_yaw){
+
+		m_yaw_error = getAngleError(m_yaw, m_initial_yaw);
+
+		if(m_yaw_error > m_difficult_level){
 			tone(BUZZER_PIN,2000,0);
 			digitalWrite(LEFT_LED_PIN,HIGH);
 			digitalWrite(RIGHT_LED_PIN,LOW);
-		}else if(m_yaw < m_lower_error_yaw){
+		}else if(m_yaw_error < -m_difficult_level){
 			tone(BUZZER_PIN,1000,0);
 			digitalWrite(LEFT_LED_PIN,LOW);
 			digitalWrite(RIGHT_LED_PIN,HIGH);
@@ -272,4 +275,12 @@ void printIMUData(void)
 	SerialOutput.print(';');
 	SerialOutput.println(String(m_difficult_level));
 
+}
+
+float customMod(double a, double b){
+	return a - floor(a/b) * b;
+}
+
+float getAngleError(float currentAngle, float initialAngle){
+	return (customMod((currentAngle - initialAngle) + 180.0, 360.0) - 180.0);
 }

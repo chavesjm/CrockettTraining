@@ -36,7 +36,7 @@ enum TrainerStatus{
 
 MPU9250_DMP imu;
 
-//#define BluetoothConf
+#define BluetoothConf
 #ifdef BluetoothConf
 BluetoothSerial SerialOutput;
 #else

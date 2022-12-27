@@ -24,6 +24,12 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Wire/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BNO055}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BNO055/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_Sensor_Lab}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_Unified_Sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BusIO}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/SPI/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1143291726" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -34,6 +40,12 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Wire/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BNO055}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BNO055/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_Sensor_Lab}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_Unified_Sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BusIO}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/SPI/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.886189450" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -44,6 +56,12 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Wire/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BNO055}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BNO055/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_Sensor_Lab}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_Unified_Sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BusIO}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/SPI/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1138897786" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>
@@ -84,7 +102,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="libraries/Adafruit_Sensor_Lab/notebooks|libraries/Adafruit_BNO055/examples_processing|libraries/Adafruit_BNO055/OBJLoader|libraries/Adafruit_BNO055/assets|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

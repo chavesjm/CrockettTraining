@@ -21,11 +21,10 @@ SparkFun 9DoF Razor IMU M0
 Supported Platforms:
 - ATSAMD21 (Arduino Zero, SparkFun SAMD21 Breakouts)
  *************************************************************/
-#include "Arduino.h"
-#include "math.h"
-#include "BluetoothSerial.h"
+#include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
+#include "math.h"
 
 
 enum TrainerStatus{

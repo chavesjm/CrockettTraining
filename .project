@@ -57,6 +57,11 @@
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/Adafruit_Unified_Sensor/1.1.7</locationURI>
 		</link>
 		<link>
+			<name>libraries/BluetoothSerial</name>
+			<type>2</type>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/2.0.5/libraries/BluetoothSerial</locationURI>
+		</link>
+		<link>
 			<name>libraries/SPI</name>
 			<type>2</type>
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/2.0.5/libraries/SPI</locationURI>

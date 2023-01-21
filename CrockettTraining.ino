@@ -39,10 +39,18 @@ enum TrainerStatus{
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
 sensors_event_t m_orientationData;
 
-//#define BluetoothConf
+#define BluetoothConf
 #ifdef BluetoothConf
+#include "BluetoothSerial.h"
+
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+
 BluetoothSerial SerialOutput;
+
 #else
+
 #define SerialOutput Serial
 #endif
 

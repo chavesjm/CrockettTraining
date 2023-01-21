@@ -25,9 +25,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_Unified_Sensor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BusIO}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/SPI/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1143291726" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -39,9 +39,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_Unified_Sensor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BusIO}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/SPI/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.886189450" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -53,9 +53,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_Unified_Sensor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/Adafruit_BusIO}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/SPI/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/ESP32/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CrockettTraining/libraries/BluetoothSerial/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1138897786" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

@@ -1,13 +1,9 @@
 Config.Release.board.BOARD.ID=ttgo-lora32
-Config.Release.board.BOARD.MENU.DebugLevel=verbose
-Config.Release.board.BOARD.MENU.EraseFlash=all
+Config.Release.board.BOARD.MENU.DebugLevel=none
+Config.Release.board.BOARD.MENU.EraseFlash=none
 Config.Release.board.BOARD.MENU.FlashFreq=80
 Config.Release.board.BOARD.MENU.Revision=TTGO_LoRa32_V1
 Config.Release.board.BOARD.MENU.UploadSpeed=460800
-Config.Release.board.BOARD.MENU.keys=getMenuItemIDFromMenuItemName did not find menu item with name "Spanish" for menu ID "keys" and for boardID "teensy31"!
-Config.Release.board.BOARD.MENU.opt=getMenuItemIDFromMenuItemName did not find menu item with name "Fastest" for menu ID "opt" and for boardID "teensy31"!
-Config.Release.board.BOARD.MENU.speed=getMenuItemIDFromMenuItemName did not find menu item with name "72 MHz" for menu ID "speed" and for boardID "teensy31"!
-Config.Release.board.BOARD.MENU.usb=getMenuItemIDFromMenuItemName did not find menu item with name "Serial" for menu ID "usb" and for boardID "teensy31"!
 Config.Release.board.BOARD.TXT=${SLOEBER_HOME}/arduinoPlugin/packages/esp32/hardware/esp32/2.0.5/boards.txt
 Config.Release.board.PROGRAMMER.NAME=Default
 Config.Release.board.UPLOAD.PORT=/dev/ttyUSB0

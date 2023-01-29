@@ -72,6 +72,8 @@ float m_roll_error = 0;
 uint16_t m_potenciometer_raw_value = 0;
 float m_difficult_level = 0;
 
+uint16_t m_printer_counter = 0;
+
 TrainerStatus m_status = IDLE;
 
 /***************************
@@ -98,7 +100,6 @@ PULSADOR: GPIO17.
 
 uint16_t BNO055_SAMPLERATE_DELAY_MS = 20; //how often to read data from the board
 
-
 void setup()
 {
 	esp_log_level_set("*", ESP_LOG_NONE);
@@ -107,6 +108,7 @@ void setup()
 
 	SerialOutput.begin(115200);
 	SerialOutput.println(freq,DEC);
+	Serial.begin(115200);
 
 #ifdef BluetoothConf
 	SerialOutput.begin("CrocketTrainer");
@@ -148,8 +150,12 @@ void loop()
 	if (SerialOutput.available() > 0) {
 		// read the incoming byte:
 		incomingByte = Serial.read();
+		Serial.println("Read = ");
+		Serial.println(incomingByte);
+		Serial.println(char(incomingByte));
 
-		if(char(incomingByte) == 'R'){
+
+		if(char(incomingByte) == 'R' || incomingByte == -1){
 			m_status = SELECTING;
 			m_initial_pitch = 0;
 			m_initial_yaw = 0;
@@ -198,11 +204,20 @@ void loop()
 	// Get Data
 	if ( bno.getEvent(&m_orientationData, Adafruit_BNO055::VECTOR_EULER))
 	{
+		calculateIMUPosition();
+
+		m_printer_counter++;
+
+		if (m_printer_counter == 4){
 			printIMUData();
+			m_printer_counter = 0;
+		}
+
+
 	}
 }
 
-void printIMUData(void)
+void calculateIMUPosition(void)
 {
 	m_yaw = m_orientationData.orientation.x;
 	m_pitch = m_orientationData.orientation.y;
@@ -241,7 +256,10 @@ void printIMUData(void)
 			digitalWrite(LEFT_LED_PIN,LOW);
 		}
 	}
+}
 
+void printIMUData(void)
+{
 	unsigned long current_update = millis();
 	float freq = (1.0/(current_update - m_last_update))*1000;
 	m_last_update = current_update;

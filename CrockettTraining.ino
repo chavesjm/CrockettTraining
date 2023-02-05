@@ -22,6 +22,7 @@ Supported Platforms:
 - ATSAMD21 (Arduino Zero, SparkFun SAMD21 Breakouts)
  *************************************************************/
 #include <Arduino.h>
+#include "BluetoothSerial.h"
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include "math.h"
@@ -39,24 +40,16 @@ enum TrainerStatus{
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
 sensors_event_t m_orientationData;
 
-#define BluetoothConf
-#ifdef BluetoothConf
-#include "BluetoothSerial.h"
-
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
 
-BluetoothSerial SerialOutput;
-
-#else
-
-#define SerialOutput Serial
-#endif
+BluetoothSerial BluetoothOutput;
 
 //#define DIFFICULTY_LEVEL 3
 
-unsigned long m_last_update = 0;
+unsigned long m_serial_last_update = 0;
+unsigned long m_bluetooth_last_update = 0;
 float m_yaw = 0;
 float m_pitch = 0;
 float m_roll = 0;
@@ -106,14 +99,9 @@ void setup()
 
 	int freq = getCpuFrequencyMhz();
 
-	SerialOutput.begin(115200);
-	SerialOutput.println(freq,DEC);
 	Serial.begin(115200);
 
-#ifdef BluetoothConf
-	SerialOutput.begin("CrocketTrainer");
-#endif
-
+	BluetoothOutput.begin("CrocketTrainer");
 
 	m_status = IDLE;
 
@@ -127,13 +115,11 @@ void setup()
 	{
 		while (1)
 		{
-			SerialOutput.println("Unable to communicate with BNO055");
-			SerialOutput.println("Check connections, and try again.");
-			SerialOutput.println();
+			Serial.println("Unable to communicate with BNO055");
+			Serial.println("Check connections, and try again.");
+			Serial.println();
 			delay(5000);
 		}
-	}else{
-		SerialOutput.println("IMU initialized!!");
 	}
 
 	tone(BUZZER_PIN,1000,3000);
@@ -147,30 +133,37 @@ void setup()
 void loop()
 {
 	int incomingByte = 0;
-	if (SerialOutput.available() > 0) {
+	if (BluetoothOutput.available() > 0) {
+		// read the incoming byte:
+		Serial.println(BluetoothOutput.available());
+		incomingByte = BluetoothOutput.read();
+		Serial.print("Read = ");
+		Serial.println(incomingByte);
+	}
+
+	if (Serial.available() > 0){
 		// read the incoming byte:
 		incomingByte = Serial.read();
 		Serial.println("Read = ");
 		Serial.println(incomingByte);
 		Serial.println(char(incomingByte));
+	}
 
+	if(char(incomingByte) == 'R' || incomingByte == -1){
+		m_status = SELECTING;
+		m_initial_pitch = 0;
+		m_initial_yaw = 0;
+		m_initial_roll = 0;
+		m_difficult_level = 0;
+		m_potenciometer_raw_value = 0;
+		m_yaw_error = 0;
+		m_pitch_error = 0;
+		m_roll_error = 0;
 
-		if(char(incomingByte) == 'R' || incomingByte == -1){
-			m_status = SELECTING;
-			m_initial_pitch = 0;
-			m_initial_yaw = 0;
-			m_initial_roll = 0;
-			m_difficult_level = 0;
-			m_potenciometer_raw_value = 0;
-			m_yaw_error = 0;
-			m_pitch_error = 0;
-			m_roll_error = 0;
+		noTone(BUZZER_PIN);
+		digitalWrite(LEFT_LED_PIN,LOW);
+		digitalWrite(RIGHT_LED_PIN,LOW);
 
-			noTone(BUZZER_PIN);
-			digitalWrite(LEFT_LED_PIN,LOW);
-			digitalWrite(RIGHT_LED_PIN,LOW);
-
-		}
 	}
 
 	if(!digitalRead(BUTTON_PIN)){
@@ -205,14 +198,7 @@ void loop()
 	if ( bno.getEvent(&m_orientationData, Adafruit_BNO055::VECTOR_EULER))
 	{
 		calculateIMUPosition();
-
-		m_printer_counter++;
-
-		if (m_printer_counter == 4){
-			printIMUData();
-			m_printer_counter = 0;
-		}
-
+		printBluetoothIMUData();
 
 	}
 }
@@ -258,38 +244,71 @@ void calculateIMUPosition(void)
 	}
 }
 
-void printIMUData(void)
+void printSerialIMUData(void)
 {
 	unsigned long current_update = millis();
-	float freq = (1.0/(current_update - m_last_update))*1000;
-	m_last_update = current_update;
+	float freq = (1.0/(current_update - m_serial_last_update))*1000;
+	m_serial_last_update = current_update;
 
-	SerialOutput.print(String(current_update));
-	SerialOutput.print(';');
-	SerialOutput.print(String(freq));
-	SerialOutput.print(';');
-	SerialOutput.print(String(0));
-	SerialOutput.print(';');
-	SerialOutput.print(String(m_yaw));
-	SerialOutput.print(';');
-	SerialOutput.print(String(m_pitch));
-	SerialOutput.print(';');
-	SerialOutput.print(String(m_roll));
-	SerialOutput.print(';');
-	SerialOutput.print(String(m_initial_yaw));
-	SerialOutput.print(';');
-	SerialOutput.print(String(m_initial_pitch));
-	SerialOutput.print(';');
-	SerialOutput.print(String(m_initial_roll));
-	SerialOutput.print(';');
-	SerialOutput.print(String(m_yaw - m_initial_yaw));
-	SerialOutput.print(';');
-	SerialOutput.print(String(m_pitch - m_initial_pitch));
-	SerialOutput.print(';');
-	SerialOutput.print(String(m_roll - m_initial_roll));
-	SerialOutput.print(';');
-	SerialOutput.println(String(m_difficult_level));
+	Serial.print(String(current_update));
+	Serial.print(';');
+	Serial.print(String(freq));
+	Serial.print(';');
+	Serial.print(String(0));
+	Serial.print(';');
+	Serial.print(String(m_yaw));
+	Serial.print(';');
+	Serial.print(String(m_pitch));
+	Serial.print(';');
+	Serial.print(String(m_roll));
+	Serial.print(';');
+	Serial.print(String(m_initial_yaw));
+	Serial.print(';');
+	Serial.print(String(m_initial_pitch));
+	Serial.print(';');
+	Serial.print(String(m_initial_roll));
+	Serial.print(';');
+	Serial.print(String(m_yaw - m_initial_yaw));
+	Serial.print(';');
+	Serial.print(String(m_pitch - m_initial_pitch));
+	Serial.print(';');
+	Serial.print(String(m_roll - m_initial_roll));
+	Serial.print(';');
+	Serial.println(String(m_difficult_level));
 
+}
+
+void printBluetoothIMUData(void)
+{
+	unsigned long current_update = millis();
+	float freq = (1.0/(current_update - m_bluetooth_last_update))*1000;
+	m_bluetooth_last_update = current_update;
+
+	/*BluetoothOutput.print(String(current_update));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(freq));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(0));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_yaw));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_pitch));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_roll));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_initial_yaw));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_initial_pitch));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_initial_roll));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_yaw - m_initial_yaw));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_pitch - m_initial_pitch));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_roll - m_initial_roll));
+	BluetoothOutput.print(';');*/
+	BluetoothOutput.println(String(m_difficult_level));
 }
 
 float customMod(double a, double b){

@@ -133,7 +133,7 @@ void setup()
 void loop()
 {
 	int incomingByte = 0;
-	if (BluetoothOutput.available() > 0) {
+	/*if (BluetoothOutput.available() > 0) {
 		// read the incoming byte:
 		Serial.println(BluetoothOutput.available());
 		incomingByte = BluetoothOutput.read();
@@ -147,9 +147,9 @@ void loop()
 		Serial.println("Read = ");
 		Serial.println(incomingByte);
 		Serial.println(char(incomingByte));
-	}
+	}*/
 
-	if(char(incomingByte) == 'R' || incomingByte == -1){
+	/*if(char(incomingByte) == 'R' || incomingByte == -1){
 		m_status = SELECTING;
 		m_initial_pitch = 0;
 		m_initial_yaw = 0;
@@ -164,7 +164,7 @@ void loop()
 		digitalWrite(LEFT_LED_PIN,LOW);
 		digitalWrite(RIGHT_LED_PIN,LOW);
 
-	}
+	}*/
 
 	if(!digitalRead(BUTTON_PIN)){
 		m_status = SELECTING;
@@ -268,7 +268,7 @@ void printSerialIMUData(void)
 	Serial.print(';');
 	Serial.print(String(m_initial_roll));
 	Serial.print(';');
-	Serial.print(String(m_yaw - m_initial_yaw));
+	Serial.print(String(m_yaw_error));
 	Serial.print(';');
 	Serial.print(String(m_pitch - m_initial_pitch));
 	Serial.print(';');
@@ -284,7 +284,7 @@ void printBluetoothIMUData(void)
 	float freq = (1.0/(current_update - m_bluetooth_last_update))*1000;
 	m_bluetooth_last_update = current_update;
 
-	/*BluetoothOutput.print(String(current_update));
+	BluetoothOutput.print(String(current_update));
 	BluetoothOutput.print(';');
 	BluetoothOutput.print(String(freq));
 	BluetoothOutput.print(';');
@@ -302,12 +302,12 @@ void printBluetoothIMUData(void)
 	BluetoothOutput.print(';');
 	BluetoothOutput.print(String(m_initial_roll));
 	BluetoothOutput.print(';');
-	BluetoothOutput.print(String(m_yaw - m_initial_yaw));
+	BluetoothOutput.print(String(m_yaw_error));
 	BluetoothOutput.print(';');
 	BluetoothOutput.print(String(m_pitch - m_initial_pitch));
 	BluetoothOutput.print(';');
 	BluetoothOutput.print(String(m_roll - m_initial_roll));
-	BluetoothOutput.print(';');*/
+	BluetoothOutput.print(';');
 	BluetoothOutput.println(String(m_difficult_level));
 }
 

@@ -109,6 +109,8 @@ void setup()
 	pinMode(RIGHT_LED_PIN,OUTPUT);
 	pinMode(LEFT_LED_PIN,OUTPUT);
 	pinMode(BUZZER_PIN, OUTPUT);
+	pinMode(LASER_PIN, OUTPUT);
+	pinMode(POTENCIOMETER_PIN,INPUT);
 
 	// Call imu.begin() to verify communication and initialize
 	if (!bno.begin())
@@ -133,38 +135,6 @@ void setup()
 void loop()
 {
 	int incomingByte = 0;
-	/*if (BluetoothOutput.available() > 0) {
-		// read the incoming byte:
-		Serial.println(BluetoothOutput.available());
-		incomingByte = BluetoothOutput.read();
-		Serial.print("Read = ");
-		Serial.println(incomingByte);
-	}
-
-	if (Serial.available() > 0){
-		// read the incoming byte:
-		incomingByte = Serial.read();
-		Serial.println("Read = ");
-		Serial.println(incomingByte);
-		Serial.println(char(incomingByte));
-	}*/
-
-	/*if(char(incomingByte) == 'R' || incomingByte == -1){
-		m_status = SELECTING;
-		m_initial_pitch = 0;
-		m_initial_yaw = 0;
-		m_initial_roll = 0;
-		m_difficult_level = 0;
-		m_potenciometer_raw_value = 0;
-		m_yaw_error = 0;
-		m_pitch_error = 0;
-		m_roll_error = 0;
-
-		noTone(BUZZER_PIN);
-		digitalWrite(LEFT_LED_PIN,LOW);
-		digitalWrite(RIGHT_LED_PIN,LOW);
-
-	}*/
 
 	if(!digitalRead(BUTTON_PIN)){
 		m_status = SELECTING;
@@ -180,6 +150,7 @@ void loop()
 		noTone(BUZZER_PIN);
 		digitalWrite(LEFT_LED_PIN,LOW);
 		digitalWrite(RIGHT_LED_PIN,LOW);
+		digitalWrite(LASER_PIN,HIGH);
 
 	}else{
 		if(m_status == SELECTING){
@@ -211,6 +182,7 @@ void calculateIMUPosition(void)
 
 	if(m_status == SELECTED && m_initial_pitch == 0 && m_initial_roll == 0 && m_initial_yaw == 0){
 		m_status = PLAYING;
+		digitalWrite(LASER_PIN, LOW);
 		tone(BUZZER_PIN, 1000, 200);
 		m_initial_pitch = m_pitch;
 		m_initial_roll = m_roll;
@@ -220,9 +192,9 @@ void calculateIMUPosition(void)
 		m_roll_error = 0;
 	}
 
-	//m_potenciometer_raw_value = analogRead(POTENCIOMETER_PIN);
-	//m_difficult_level = (m_potenciometer_raw_value * MAX_ERROR) / 4098.0;
-	m_difficult_level = 3.0;
+	m_potenciometer_raw_value = analogRead(POTENCIOMETER_PIN);
+	m_difficult_level = (m_potenciometer_raw_value * MAX_ERROR) / 4098.0;
+	//m_difficult_level = 3.0;
 
 	if(m_status == PLAYING){
 

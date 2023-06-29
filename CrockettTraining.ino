@@ -37,7 +37,7 @@ enum TrainerStatus{
 
 // Check I2C device address and correct line below (by default address is 0x29 or 0x28)
 //                                   id, address
-Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
+Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x29);
 sensors_event_t m_orientationData;
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
@@ -169,7 +169,8 @@ void loop()
 	if ( bno.getEvent(&m_orientationData, Adafruit_BNO055::VECTOR_EULER))
 	{
 		calculateIMUPosition();
-		printBluetoothIMUData();
+		//printBluetoothIMUData();
+		printSerialIMUData();
 
 	}
 }

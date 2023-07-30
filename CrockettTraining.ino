@@ -83,8 +83,8 @@ PULSADOR: GPIO17.
 
 #define MAX_ERROR 3
 
-#define BUTTON_PIN 17
-#define BUZZER_PIN 16
+#define BUTTON_PIN 27//1.4 ESP32 Version => 17
+#define BUZZER_PIN 25//1.4 ESP32 Version => 16
 #define LASER_PIN 23
 #define POTENCIOMETER_PIN 35
 #define BATTERY_PIN 34

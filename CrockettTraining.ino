@@ -1,26 +1,4 @@
-/************************************************************
-MPU9250_DMP_Quaternion
- Quaternion example for MPU-9250 DMP Arduino Library
-Jim Lindblom @ SparkFun Electronics
-original creation date: November 23, 2016
-https://github.com/sparkfun/SparkFun_MPU9250_DMP_Arduino_Library
 
-The MPU-9250's digital motion processor (DMP) can calculate
-four unit quaternions, which can be used to represent the
-rotation of an object.
-
-This exmaple demonstrates how to configure the DMP to
-calculate quaternions, and prints them out to the serial
-monitor. It also calculates pitch, roll, and yaw from those
-values.
-
-Development environment specifics:
-Arduino IDE 1.6.12
-SparkFun 9DoF Razor IMU M0
-
-Supported Platforms:
-- ATSAMD21 (Arduino Zero, SparkFun SAMD21 Breakouts)
- *************************************************************/
 #include <Arduino.h>
 #include "BluetoothSerial.h"
 #include <Adafruit_Sensor.h>
@@ -28,11 +6,14 @@ Supported Platforms:
 #include "math.h"
 
 
+#define VERSION "ECroST 1.0"
+
 enum TrainerStatus{
 	IDLE,
 	SELECTING,
 	SELECTED,
-	PLAYING
+	PLAYING,
+  HW_TEST
 };
 
 // Check I2C device address and correct line below (by default address is 0x29 or 0x28)
@@ -48,6 +29,7 @@ BluetoothSerial BluetoothOutput;
 
 //#define DIFFICULTY_LEVEL 3
 
+bool m_debug_mode = false;
 unsigned long m_serial_last_update = 0;
 unsigned long m_bluetooth_last_update = 0;
 float m_yaw = 0;
@@ -81,7 +63,7 @@ LED RIGHT:GPIO32.
 PULSADOR: GPIO17.
 *******************************/
 
-#define MAX_ERROR 3
+#define MAX_ERROR 5
 
 #define BUTTON_PIN 27//1.4 ESP32 Version => 17
 #define BUZZER_PIN 25//1.4 ESP32 Version => 16
@@ -91,6 +73,9 @@ PULSADOR: GPIO17.
 #define RIGHT_LED_PIN 32
 #define LEFT_LED_PIN 18
 
+#define SSID_NAME "ECroST"
+#define BAUDRATE_SERIALPORT_OUTPUT 115200
+
 uint16_t BNO055_SAMPLERATE_DELAY_MS = 20; //how often to read data from the board
 
 void setup()
@@ -98,10 +83,6 @@ void setup()
 	esp_log_level_set("*", ESP_LOG_NONE);
 
 	int freq = getCpuFrequencyMhz();
-
-	Serial.begin(115200);
-
-	BluetoothOutput.begin("CrocketTrainer");
 
 	m_status = IDLE;
 
@@ -124,19 +105,45 @@ void setup()
 		}
 	}
 
-	tone(BUZZER_PIN,1000,3000);
-	digitalWrite(LEFT_LED_PIN,HIGH);
-	digitalWrite(RIGHT_LED_PIN,HIGH);
-	delay(3000);
+  bool debug_mode = !digitalRead(BUTTON_PIN);
+  tone(BUZZER_PIN,1000,1000);
+  digitalWrite(LEFT_LED_PIN,HIGH);
+  digitalWrite(RIGHT_LED_PIN,HIGH);
+	delay(1000);
 	digitalWrite(LEFT_LED_PIN,LOW);
 	digitalWrite(RIGHT_LED_PIN,LOW);
+  
+  if(debug_mode && !digitalRead(BUTTON_PIN)){
+    
+    tone(BUZZER_PIN,1000,200);
+    delay(200);
+    tone(BUZZER_PIN,1000,200);
+
+    delay(2000);
+
+    if(!digitalRead(BUTTON_PIN)){
+
+      m_status = HW_TEST;
+      digitalWrite(LASER_PIN,HIGH);
+      digitalWrite(LEFT_LED_PIN,HIGH);
+      digitalWrite(RIGHT_LED_PIN,HIGH);
+      tone(BUZZER_PIN,1000,0);  
+      
+      
+    }else{
+      
+      m_debug_mode = true;
+      Serial.begin(BAUDRATE_SERIALPORT_OUTPUT);
+      BluetoothOutput.begin(SSID_NAME);  
+    }   
+  }
 }
 
 void loop()
 {
 	int incomingByte = 0;
 
-	if(!digitalRead(BUTTON_PIN)){
+	if(!digitalRead(BUTTON_PIN) && m_status != HW_TEST){
 		m_status = SELECTING;
 		m_initial_pitch = 0;
 		m_initial_yaw = 0;
@@ -169,8 +176,11 @@ void loop()
 	if ( bno.getEvent(&m_orientationData, Adafruit_BNO055::VECTOR_EULER))
 	{
 		calculateIMUPosition();
-		//printBluetoothIMUData();
-		printSerialIMUData();
+
+    if(m_debug_mode){
+		  printBluetoothIMUData();
+		  printSerialIMUData();
+    }
 
 	}
 }
@@ -195,20 +205,19 @@ void calculateIMUPosition(void)
 
 	m_potenciometer_raw_value = analogRead(POTENCIOMETER_PIN);
 	m_difficult_level = (m_potenciometer_raw_value * MAX_ERROR) / 4098.0;
-	//m_difficult_level = 3.0;
 
 	if(m_status == PLAYING){
 
 		m_yaw_error = getAngleError(m_yaw, m_initial_yaw);
 
 		if(m_yaw_error > m_difficult_level){
-			tone(BUZZER_PIN,2000,0);
 			digitalWrite(LEFT_LED_PIN,HIGH);
-			digitalWrite(RIGHT_LED_PIN,LOW);
+      digitalWrite(RIGHT_LED_PIN,LOW);
+			tone(BUZZER_PIN,2000,0);
 		}else if(m_yaw_error < -m_difficult_level){
-			tone(BUZZER_PIN,1000,0);
 			digitalWrite(LEFT_LED_PIN,LOW);
 			digitalWrite(RIGHT_LED_PIN,HIGH);
+      tone(BUZZER_PIN,1000,0);
 		}else{
 			noTone(BUZZER_PIN);
 			digitalWrite(RIGHT_LED_PIN,LOW);
@@ -223,6 +232,8 @@ void printSerialIMUData(void)
 	float freq = (1.0/(current_update - m_serial_last_update))*1000;
 	m_serial_last_update = current_update;
 
+  Serial.print(String(VERSION));
+  Serial.print(';');
 	Serial.print(String(current_update));
 	Serial.print(';');
 	Serial.print(String(freq));
@@ -257,6 +268,8 @@ void printBluetoothIMUData(void)
 	float freq = (1.0/(current_update - m_bluetooth_last_update))*1000;
 	m_bluetooth_last_update = current_update;
 
+  BluetoothOutput.print(String(VERSION));
+  BluetoothOutput.print(';');
 	BluetoothOutput.print(String(current_update));
 	BluetoothOutput.print(';');
 	BluetoothOutput.print(String(freq));

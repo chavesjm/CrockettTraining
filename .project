@@ -32,34 +32,14 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>core/core</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/2.0.5/cores/esp32</locationURI>
-		</link>
-		<link>
-			<name>core/variant</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/2.0.5/variants/ttgo-lora32-v1</locationURI>
-		</link>
-		<link>
-			<name>libraries/Adafruit_BNO055</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/Adafruit_BNO055/1.6.1</locationURI>
-		</link>
-		<link>
-			<name>libraries/Adafruit_BusIO</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/Adafruit_BusIO/1.14.1</locationURI>
-		</link>
-		<link>
-			<name>libraries/Adafruit_Unified_Sensor</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/Adafruit_Unified_Sensor/1.1.7</locationURI>
-		</link>
-		<link>
 			<name>libraries/BluetoothSerial</name>
 			<type>2</type>
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/2.0.5/libraries/BluetoothSerial</locationURI>
+		</link>
+		<link>
+			<name>libraries/EEPROM</name>
+			<type>2</type>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/2.0.5/libraries/EEPROM</locationURI>
 		</link>
 		<link>
 			<name>libraries/SPI</name>

@@ -12,8 +12,7 @@ enum TrainerStatus{
 	IDLE,
 	SELECTING,
 	SELECTED,
-	PLAYING,
-  HW_TEST
+	PLAYING
 };
 
 // Check I2C device address and correct line below (by default address is 0x29 or 0x28)
@@ -27,9 +26,8 @@ sensors_event_t m_orientationData;
 
 BluetoothSerial BluetoothOutput;
 
-//#define DIFFICULTY_LEVEL 3
-
 bool m_debug_mode = false;
+bool m_laser_always_powered_on = false;
 unsigned long m_serial_last_update = 0;
 unsigned long m_bluetooth_last_update = 0;
 float m_yaw = 0;
@@ -93,6 +91,8 @@ void setup()
 	pinMode(LASER_PIN, OUTPUT);
 	pinMode(POTENCIOMETER_PIN,INPUT);
 
+	m_laser_always_powered_on = !digitalRead(BUTTON_PIN);
+
 	// Call imu.begin() to verify communication and initialize
 	if (!bno.begin())
 	{
@@ -104,46 +104,39 @@ void setup()
 			delay(5000);
 		}
 	}
-
-  bool debug_mode = !digitalRead(BUTTON_PIN);
-  tone(BUZZER_PIN,1000,1000);
-  digitalWrite(LEFT_LED_PIN,HIGH);
-  digitalWrite(RIGHT_LED_PIN,HIGH);
+  
+	
+  	tone(BUZZER_PIN,1000,1000);
+  	digitalWrite(LEFT_LED_PIN,HIGH);
+  	digitalWrite(RIGHT_LED_PIN,HIGH);
 	delay(1000);
 	digitalWrite(LEFT_LED_PIN,LOW);
 	digitalWrite(RIGHT_LED_PIN,LOW);
   
-  if(debug_mode && !digitalRead(BUTTON_PIN)){
-    
-    tone(BUZZER_PIN,1000,200);
-    delay(200);
-    tone(BUZZER_PIN,1000,200);
-
-    delay(2000);
-
     if(!digitalRead(BUTTON_PIN)){
+    
+    	tone(BUZZER_PIN,1000,200);
+    	delay(200);
+    	tone(BUZZER_PIN,1000,200);
 
-      m_status = HW_TEST;
-      digitalWrite(LASER_PIN,HIGH);
-      digitalWrite(LEFT_LED_PIN,HIGH);
-      digitalWrite(RIGHT_LED_PIN,HIGH);
-      tone(BUZZER_PIN,1000,0);  
-      
-      
-    }else{
-      
-      m_debug_mode = true;
-      Serial.begin(BAUDRATE_SERIALPORT_OUTPUT);
-      BluetoothOutput.begin(SSID_NAME);  
-    }   
-  }
+    	delay(2000);
+
+		//If the button is not pushed when the device is powered on
+		//but it is pushed when the beep is played, the application writes
+		//output debug data in Bluetooth and Serial ports.
+    	if(!m_laser_always_powered_on && !digitalRead(BUTTON_PIN)){      
+      		m_debug_mode = true;
+      		Serial.begin(BAUDRATE_SERIALPORT_OUTPUT);
+      		BluetoothOutput.begin(SSID_NAME);  
+    	}   
+	}
 }
 
 void loop()
 {
 	int incomingByte = 0;
 
-	if(!digitalRead(BUTTON_PIN) && m_status != HW_TEST){
+	if(!digitalRead(BUTTON_PIN)){
 		m_status = SELECTING;
 		m_initial_pitch = 0;
 		m_initial_yaw = 0;
@@ -192,8 +185,13 @@ void calculateIMUPosition(void)
 	m_roll = m_orientationData.orientation.z;
 
 	if(m_status == SELECTED && m_initial_pitch == 0 && m_initial_roll == 0 && m_initial_yaw == 0){
+		
 		m_status = PLAYING;
-		digitalWrite(LASER_PIN, LOW);
+
+		if(m_laser_always_powered_on){
+			digitalWrite(LASER_PIN, LOW);
+		}
+		
 		tone(BUZZER_PIN, 1000, 200);
 		m_initial_pitch = m_pitch;
 		m_initial_roll = m_roll;

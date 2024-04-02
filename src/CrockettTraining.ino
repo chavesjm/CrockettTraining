@@ -91,7 +91,9 @@ void setup()
 	pinMode(LASER_PIN, OUTPUT);
 	pinMode(POTENCIOMETER_PIN,INPUT);
 
-	m_laser_always_powered_on = !digitalRead(BUTTON_PIN);
+	//To enter in Debug Mode the Button must be pushed when the device
+	//is Powered ON
+	bool debug_mode = !digitalRead(BUTTON_PIN);
 
 	// Call imu.begin() to verify communication and initialize
 	if (!bno.begin())
@@ -113,21 +115,28 @@ void setup()
 	digitalWrite(LEFT_LED_PIN,LOW);
 	digitalWrite(RIGHT_LED_PIN,LOW);
   
-    if(!digitalRead(BUTTON_PIN)){
-    
+    //When the check beep is played and the Button continues pushed
+	//The debug mode will be enabled
+    if(debug_mode && !digitalRead(BUTTON_PIN)){
+		
+		delay(1000);
     	tone(BUZZER_PIN,1000,200);
     	delay(200);
-    	tone(BUZZER_PIN,1000,200);
-
+		tone(BUZZER_PIN,1000,200);
     	delay(2000);
 
-		//If the button is not pushed when the device is powered on
-		//but it is pushed when the beep is played, the application writes
-		//output debug data in Bluetooth and Serial ports.
-    	if(!m_laser_always_powered_on && !digitalRead(BUTTON_PIN)){      
-      		m_debug_mode = true;
-      		Serial.begin(BAUDRATE_SERIALPORT_OUTPUT);
-      		BluetoothOutput.begin(SSID_NAME);  
+		m_debug_mode = true;
+      	Serial.begin(BAUDRATE_SERIALPORT_OUTPUT);
+      	BluetoothOutput.begin(SSID_NAME);  
+
+		//If the button continues pushed the laser keeps always powered ON.
+    	if(!digitalRead(BUTTON_PIN)){
+			tone(BUZZER_PIN,1000,200);
+    		delay(200);
+			tone(BUZZER_PIN,1000,200);
+
+			m_laser_always_powered_on = true;
+			digitalWrite(LASER_PIN,HIGH);
     	}   
 	}
 }
@@ -188,7 +197,7 @@ void calculateIMUPosition(void)
 		
 		m_status = PLAYING;
 
-		if(m_laser_always_powered_on){
+		if(!m_laser_always_powered_on){
 			digitalWrite(LASER_PIN, LOW);
 		}
 		

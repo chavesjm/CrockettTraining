@@ -52,8 +52,10 @@ TrainerStatus m_status = IDLE;
 /***************************
 BUZZER: GPIO16.
 LASER: GPIO23
-POTENCIOMETRO: GPIO35
-BATERIA: GPIO34.
+//POTENCIOMETRO: GPIO35
+POTENCIOMETRO: GPIO33
+//BATERIA: GPIO34.
+BATERIA: GPIO35.
 I2C SDA: GPIO21.
 I2C SCL: GPIO22.
 LED LEFT: GPIO18.
@@ -66,8 +68,9 @@ PULSADOR: GPIO17.
 #define BUTTON_PIN 27//1.4 ESP32 Version => 17
 #define BUZZER_PIN 25//1.4 ESP32 Version => 16
 #define LASER_PIN 23
-#define POTENCIOMETER_PIN 35
-#define BATTERY_PIN 34
+//#define POTENCIOMETER_PIN 35
+#define POTENCIOMETER_PIN 33
+#define BATTERY_PIN 35
 #define RIGHT_LED_PIN 32
 #define LEFT_LED_PIN 18
 
@@ -90,7 +93,7 @@ void setup()
 	pinMode(BUZZER_PIN, OUTPUT);
 	pinMode(LASER_PIN, OUTPUT);
 	pinMode(POTENCIOMETER_PIN,INPUT);
-
+  
 	//To enter in Debug Mode the Button must be pushed when the device
 	//is Powered ON
 	bool debug_mode = !digitalRead(BUTTON_PIN);
@@ -192,6 +195,7 @@ void calculateIMUPosition(void)
 	m_yaw = m_orientationData.orientation.x;
 	m_pitch = m_orientationData.orientation.y;
 	m_roll = m_orientationData.orientation.z;
+  
 
 	if(m_status == SELECTED && m_initial_pitch == 0 && m_initial_roll == 0 && m_initial_yaw == 0){
 		
@@ -211,7 +215,7 @@ void calculateIMUPosition(void)
 	}
 
 	m_potenciometer_raw_value = analogRead(POTENCIOMETER_PIN);
-	m_difficult_level = (m_potenciometer_raw_value * MAX_ERROR) / 4098.0;
+	m_difficult_level = (m_potenciometer_raw_value * MAX_ERROR) / 4095.0;
 
 	if(m_status == PLAYING){
 
@@ -220,11 +224,13 @@ void calculateIMUPosition(void)
 		if(m_yaw_error > m_difficult_level){
 			digitalWrite(LEFT_LED_PIN,HIGH);
       digitalWrite(RIGHT_LED_PIN,LOW);
-			tone(BUZZER_PIN,2000,0);
+			//tone(BUZZER_PIN,2000,0);
+      tone(BUZZER_PIN,4000,0);
 		}else if(m_yaw_error < -m_difficult_level){
 			digitalWrite(LEFT_LED_PIN,LOW);
 			digitalWrite(RIGHT_LED_PIN,HIGH);
-      tone(BUZZER_PIN,1000,0);
+      //tone(BUZZER_PIN,1000,0);
+      tone(BUZZER_PIN,2000,0);
 		}else{
 			noTone(BUZZER_PIN);
 			digitalWrite(RIGHT_LED_PIN,LOW);

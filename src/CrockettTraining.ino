@@ -11,6 +11,7 @@
 enum TrainerStatus{
 	IDLE,
 	SELECTING,
+	COUNTDOWN,
 	SELECTED,
 	PLAYING
 };
@@ -46,6 +47,8 @@ uint16_t m_potenciometer_raw_value = 0;
 float m_difficult_level = 0;
 
 uint16_t m_printer_counter = 0;
+uint64_t m_countdown_timer = 0;
+uint64_t m_countdown_signal_timer = 0;
 
 TrainerStatus m_status = IDLE;
 
@@ -97,6 +100,7 @@ void setup()
 	//To enter in Debug Mode the Button must be pushed when the device
 	//is Powered ON
 	bool debug_mode = !digitalRead(BUTTON_PIN);
+	Serial.begin(BAUDRATE_SERIALPORT_OUTPUT);
 
 	// Call imu.begin() to verify communication and initialize
 	if (!bno.begin())
@@ -149,7 +153,14 @@ void loop()
 	int incomingByte = 0;
 
 	if(!digitalRead(BUTTON_PIN)){
+		
+		if(m_countdown_timer == 0 || m_status == COUNTDOWN){
+			m_countdown_timer = millis();
+		}
+
 		m_status = SELECTING;
+		
+
 		m_initial_pitch = 0;
 		m_initial_yaw = 0;
 		m_initial_roll = 0;
@@ -166,7 +177,35 @@ void loop()
 
 	}else{
 		if(m_status == SELECTING){
-			m_status = SELECTED;
+
+			if((millis() - m_countdown_timer) >= 3000){
+				m_status = COUNTDOWN;
+				m_countdown_timer = millis();
+				m_countdown_signal_timer = 0;
+				
+			}else{
+				m_status = SELECTED;
+				m_countdown_timer = 0;
+			}
+		}else if(m_status == COUNTDOWN){
+
+			if(m_countdown_signal_timer == 0){
+				m_countdown_signal_timer = millis();
+				Serial.println("Initial coutdown tone");
+				tone(BUZZER_PIN,1000,100);
+			}else if((millis() - m_countdown_timer) >= 10000){
+				m_countdown_signal_timer = 0;
+				m_countdown_timer = 0;
+				Serial.println("Final coutdown tone");
+				tone(BUZZER_PIN,1000,500);
+				m_status = SELECTED;			
+			}else if((millis() - m_countdown_signal_timer) >= 1000){
+				Serial.println(String(m_countdown_signal_timer));
+				Serial.println(String(millis()));
+				m_countdown_signal_timer = millis();
+				Serial.println("Signal coutdown tone");
+				tone(BUZZER_PIN,1000,100);
+			}
 		}
 	}
 

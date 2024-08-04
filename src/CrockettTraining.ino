@@ -191,19 +191,14 @@ void loop()
 
 			if(m_countdown_signal_timer == 0){
 				m_countdown_signal_timer = millis();
-				Serial.println("Initial coutdown tone");
 				tone(BUZZER_PIN,1000,100);
 			}else if((millis() - m_countdown_timer) >= 10000){
 				m_countdown_signal_timer = 0;
 				m_countdown_timer = 0;
-				Serial.println("Final coutdown tone");
 				tone(BUZZER_PIN,1000,500);
 				m_status = SELECTED;			
 			}else if((millis() - m_countdown_signal_timer) >= 1000){
-				Serial.println(String(m_countdown_signal_timer));
-				Serial.println(String(millis()));
 				m_countdown_signal_timer = millis();
-				Serial.println("Signal coutdown tone");
 				tone(BUZZER_PIN,1000,100);
 			}
 		}

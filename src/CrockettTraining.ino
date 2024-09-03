@@ -49,6 +49,7 @@ float m_difficult_level = 0;
 uint16_t m_printer_counter = 0;
 uint64_t m_countdown_timer = 0;
 uint64_t m_countdown_signal_timer = 0;
+bool m_countdown_signaled = false;
 
 TrainerStatus m_status = IDLE;
 
@@ -158,6 +159,12 @@ void loop()
 			m_countdown_timer = millis();
 		}
 
+		if(!m_countdown_signaled && (millis() - m_countdown_timer) >= 3000){
+			tone(BUZZER_PIN,1000,100);
+		    m_countdown_signaled = true;
+			
+		}
+
 		m_status = SELECTING;
 		
 
@@ -182,6 +189,7 @@ void loop()
 				m_status = COUNTDOWN;
 				m_countdown_timer = millis();
 				m_countdown_signal_timer = 0;
+				m_countdown_signaled = false;
 				
 			}else{
 				m_status = SELECTED;
@@ -194,6 +202,7 @@ void loop()
 				tone(BUZZER_PIN,1000,100);
 			}else if((millis() - m_countdown_timer) >= 10000){
 				m_countdown_signal_timer = 0;
+				m_countdown_signaled = false;
 				m_countdown_timer = 0;
 				tone(BUZZER_PIN,1000,500);
 				m_status = SELECTED;			

@@ -6,7 +6,7 @@
 #include "math.h"
 
 
-#define VERSION "ECroST 1.0"
+#define VERSION "ECroST 10_11_2024"
 
 enum TrainerStatus{
 	IDLE,
@@ -46,10 +46,11 @@ float m_roll_error = 0;
 uint16_t m_potenciometer_raw_value = 0;
 float m_difficult_level = 0;
 
-uint16_t m_printer_counter = 0;
 uint64_t m_countdown_timer = 0;
 uint64_t m_countdown_signal_timer = 0;
 bool m_countdown_signaled = false;
+
+bool m_always_laser_signaled = false;
 
 TrainerStatus m_status = IDLE;
 
@@ -165,6 +166,11 @@ void loop()
 			
 		}
 
+		if(!m_always_laser_signaled && (millis() - m_countdown_timer) >= 8000){
+			tone(BUZZER_PIN,1000,200);
+			m_always_laser_signaled = true;
+		}
+
 		m_status = SELECTING;
 		
 
@@ -186,14 +192,25 @@ void loop()
 		if(m_status == SELECTING){
 
 			if((millis() - m_countdown_timer) >= 3000){
+				
+				if((millis() - m_countdown_timer) >= 8000){
+					m_laser_always_powered_on = true;
+				}
+				else{
+					m_laser_always_powered_on = false;
+				}
+				
 				m_status = COUNTDOWN;
 				m_countdown_timer = millis();
 				m_countdown_signal_timer = 0;
 				m_countdown_signaled = false;
+				m_always_laser_signaled = false;
+
 				
 			}else{
 				m_status = SELECTED;
 				m_countdown_timer = 0;
+				m_laser_always_powered_on = false;
 			}
 		}else if(m_status == COUNTDOWN){
 
@@ -203,6 +220,7 @@ void loop()
 			}else if((millis() - m_countdown_timer) >= 10000){
 				m_countdown_signal_timer = 0;
 				m_countdown_signaled = false;
+				m_always_laser_signaled = false;
 				m_countdown_timer = 0;
 				tone(BUZZER_PIN,1000,500);
 				m_status = SELECTED;			

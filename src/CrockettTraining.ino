@@ -46,6 +46,11 @@ float m_roll_error = 0;
 uint16_t m_potenciometer_raw_value = 0;
 float m_difficult_level = 0;
 
+uint8_t m_sys_calibration = 0;
+uint8_t m_gyro_calibration = 0;
+uint8_t m_accel_calibration = 0;
+uint8_t m_mag_calibration = 0;
+
 uint64_t m_countdown_timer = 0;
 uint64_t m_countdown_signal_timer = 0;
 bool m_countdown_signaled = false;
@@ -241,6 +246,11 @@ void loop()
 	// Get Data
 	if ( bno.getEvent(&m_orientationData, Adafruit_BNO055::VECTOR_EULER))
 	{
+		bno.getCalibration(&m_sys_calibration, 
+		&m_gyro_calibration, 
+		&m_accel_calibration, 
+		&m_mag_calibration);
+
 		calculateIMUPosition();
 
     if(m_debug_mode){
@@ -332,7 +342,15 @@ void printSerialIMUData(void)
 	Serial.print(';');
 	Serial.print(String(m_roll - m_initial_roll));
 	Serial.print(';');
-	Serial.println(String(m_difficult_level));
+	Serial.print(String(m_difficult_level));
+	Serial.print(';');
+	Serial.print(String(m_sys_calibration));
+	Serial.print(';');
+	Serial.print(String(m_gyro_calibration));
+	Serial.print(';');
+	Serial.print(String(m_accel_calibration));
+	Serial.print(';');
+	Serial.println(String(m_mag_calibration));
 
 }
 
@@ -368,7 +386,15 @@ void printBluetoothIMUData(void)
 	BluetoothOutput.print(';');
 	BluetoothOutput.print(String(m_roll - m_initial_roll));
 	BluetoothOutput.print(';');
-	BluetoothOutput.println(String(m_difficult_level));
+	BluetoothOutput.print(String(m_difficult_level));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_sys_calibration));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_gyro_calibration));
+	BluetoothOutput.print(';');
+	BluetoothOutput.print(String(m_accel_calibration));
+	BluetoothOutput.print(';');
+	BluetoothOutput.println(String(m_mag_calibration));
 }
 
 float customMod(double a, double b){

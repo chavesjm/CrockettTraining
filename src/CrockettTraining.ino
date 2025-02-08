@@ -110,7 +110,7 @@ void setup()
 	Serial.begin(BAUDRATE_SERIALPORT_OUTPUT);
 
 	// Call imu.begin() to verify communication and initialize
-	if (!bno.begin())
+	if (!bno.begin(OPERATION_MODE_IMUPLUS))
 	{
 		while (1)
 		{

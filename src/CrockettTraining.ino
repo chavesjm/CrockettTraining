@@ -53,8 +53,6 @@ uint8_t m_mag_calibration = 0;
 
 uint64_t m_countdown_timer = 0;
 uint64_t m_countdown_signal_timer = 0;
-bool m_countdown_signaled = false;
-
 bool m_always_laser_signaled = false;
 
 TrainerStatus m_status = IDLE;
@@ -155,20 +153,13 @@ void loop()
 			m_countdown_timer = millis();
 		}
 
-		if(!m_countdown_signaled && (millis() - m_countdown_timer) >= 3000){
-			tone(BUZZER_PIN,1000,100);
-		    m_countdown_signaled = true;
-			
-		}
-
-		if(!m_always_laser_signaled && (millis() - m_countdown_timer) >= 8000){
+		if(!m_always_laser_signaled && (millis() - m_countdown_timer) >= 3000){
 			tone(BUZZER_PIN,1000,200);
 			m_always_laser_signaled = true;
 		}
 
 		m_status = SELECTING;
 		
-
 		m_initial_pitch = 0;
 		m_initial_yaw = 0;
 		m_initial_roll = 0;
@@ -187,34 +178,26 @@ void loop()
 		if(m_status == SELECTING){
 
 			if((millis() - m_countdown_timer) >= 3000){
-				
-				if((millis() - m_countdown_timer) >= 8000){
-					m_laser_always_powered_on = true;
-				}
-				else{
-					m_laser_always_powered_on = false;
-				}
-				
-				m_status = COUNTDOWN;
-				m_countdown_timer = millis();
-				m_countdown_signal_timer = 0;
-				m_countdown_signaled = false;
-				m_always_laser_signaled = false;
 
-				
+				m_laser_always_powered_on = true;
 			}else{
-				m_status = SELECTED;
-				m_countdown_timer = 0;
+
 				m_laser_always_powered_on = false;
 			}
-		}else if(m_status == COUNTDOWN){
+				
+			m_status = COUNTDOWN;
+			m_countdown_timer = millis();
+			m_countdown_signal_timer = 0;
+			m_always_laser_signaled = false;	
+		}
+		
+		if(m_status == COUNTDOWN){
 
 			if(m_countdown_signal_timer == 0){
 				m_countdown_signal_timer = millis();
 				tone(BUZZER_PIN,1000,100);
 			}else if((millis() - m_countdown_timer) >= 10000){
 				m_countdown_signal_timer = 0;
-				m_countdown_signaled = false;
 				m_always_laser_signaled = false;
 				m_countdown_timer = 0;
 				tone(BUZZER_PIN,1000,500);

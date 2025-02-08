@@ -6,7 +6,7 @@
 #include "math.h"
 
 
-#define VERSION "ECroST 10_11_2024"
+#define VERSION "ECroST 08_02_2025"
 
 enum TrainerStatus{
 	IDLE,

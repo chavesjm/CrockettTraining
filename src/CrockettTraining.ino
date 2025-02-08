@@ -141,17 +141,7 @@ void setup()
 
 		m_debug_mode = true;
       	Serial.begin(BAUDRATE_SERIALPORT_OUTPUT);
-      	BluetoothOutput.begin(SSID_NAME);  
-
-		//If the button continues pushed the laser keeps always powered ON.
-    	if(!digitalRead(BUTTON_PIN)){
-			tone(BUZZER_PIN,1000,200);
-    		delay(200);
-			tone(BUZZER_PIN,1000,200);
-
-			m_laser_always_powered_on = true;
-			digitalWrite(LASER_PIN,HIGH);
-    	}   
+      	BluetoothOutput.begin(SSID_NAME);   
 	}
 }
 
